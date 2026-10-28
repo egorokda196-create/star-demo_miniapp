@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Star Demo</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0b0e16;
+  --panel: #151a29;
+  --line: #252c40;
+  --purple: #8b5cf6;
+  --cyan: #42d9ff;
+  --text: #f5f7ff;
+  --muted: #9ca8c4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at 50% -15%, #30205c, transparent 50%), var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+}
+.app { max-width: 480px; margin: auto; padding: 22px 16px 30px; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.brand { font-weight: 850; font-size: 20px; }
+.brand span { color: var(--cyan); }
+.tag { font-size: 11px; border: 1px solid #3d365f; background: #201a38; color: #cbbcff; padding: 7px 10px; border-radius: 99px; }
+.welcome { color: var(--muted); font-size: 14px; margin-bottom: 15px; }
+.hero { border: 1px solid #42346b; background: linear-gradient(135deg,#21183e,#151b2c 72%); border-radius: 24px; padding: 23px; }
+.label { color: #c3b6f9; font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; }
+.balance { font-size: 42px; font-weight: 900; margin: 10px 0 4px; }
+.coin { color: #ffd66b; }
+.sub { color: var(--muted); font-size: 13px; }
+.primary { background: linear-gradient(100deg,#7547e8,#4d75ed); border: 0; color: white; border-radius: 15px; padding: 15px; width: 100%; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 14px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 25px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 15px; }
+.stat b { display: block; font-size: 18px; margin-bottom: 4px; }
+.stat small { color: var(--muted); }
+h2 { font-size: 17px; margin: 24px 0 12px; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.action { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 17px; padding: 17px 14px; text-align: left; min-height: 108px; cursor: pointer; font: inherit; }
+.icon { font-size: 24px; display: block; margin-bottom: 13px; }
+.action strong { display: block; font-size: 14px; }
+.action small { display: block; color: var(--muted); margin-top: 5px; font-size: 12px; }
+.note { margin-top: 22px; padding: 14px; border-radius: 14px; background: #111827; border: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.5; }
+.nav { display: flex; gap: 8px; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
+.nav button { flex: 1; background: transparent; border: 0; color: var(--muted); padding: 9px 2px; font-size: 12px; }
+.nav button.active { color: var(--cyan); }
+#toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%,20px); opacity: 0; background: #242b3e; border: 1px solid #3c4661; padding: 12px 17px; border-radius: 12px; max-width: 90%; font-size: 13px; transition: .2s; pointer-events: none; }
+#toast.show { opacity: 1; transform: translate(-50%,0); }
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <div class="brand">✦ STAR<span>DEMO</span></div>
+    <div class="tag">MINI APP · DEMO</div>
+  </div>
+
+  <div class="welcome" id="welcome">Привет! Добро пожаловать в тестовое приложение.</div>
+
+  <section class="hero">
+    <div class="label">Твой баланс</div>
+    <div class="balance"><span id="balance">1 250</span> <span class="coin">✦</span></div>
+    <div class="sub">тестовых звёзд</div>
+    <button class="primary" onclick="bonus()">🎁 Забрать ежедневный бонус</button>
+  </section>
+
+  <div class="row">
+    <div class="stat"><b id="level">Уровень 2</b><small>Профиль игрока</small></div>
+    <div class="stat"><b id="streak">0 дней</b><small>Серия бонусов</small></div>
+  </div>
+
+  <h2>Что будем делать?</h2>
+
+  <div class="actions">
+    <button class="action" onclick="openSection('Игры')">
+      <span class="icon">🎮</span><strong>Мини-игры</strong><small>Тестовые задания</small>
+    </button>
+    <button class="action" onclick="openSection('Задания')">
+      <span class="icon">⚡</span><strong>Задания</strong><small>Получай бонусы</small>
+    </button>
+    <button class="action" onclick="openSection('Инвентарь')">
+      <span class="icon">🎒</span><strong>Инвентарь</strong><small>Твои предметы</small>
+    </button>
+    <button class="action" onclick="openSection('Профиль')">
+      <span class="icon">👤</span><strong>Профиль</strong><small>Данные аккаунта</small>
+    </button>
+  </div>
+
+  <div class="note">
+    Это тестовая демонстрация. Баланс хранится в браузере и не является настоящими Telegram Stars.
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="nav(this,'Главная')">⌂ Главная</button>
+    <button onclick="nav(this,'Активности')">✦ Активности</button>
+    <button onclick="nav(this,'Профиль')">☺ Профиль</button>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+let balance = 1250;
+let streak = 0;
+let lastBonus = '';
+
+try {
+  const s = JSON.parse(localStorage.getItem('starDemo') || '{}');
+  balance = s.balance ?? 1250;
+  streak = s.streak ?? 0;
+  lastBonus = s.lastBonus ?? '';
+} catch(e) {}
+
+function render() {
+  document.getElementById('balance').textContent = balance.toLocaleString('ru-RU');
+  document.getElementById('streak').textContent = streak + ' дн.';
+  document.getElementById('level').textContent = 'Уровень ' + (Math.floor(balance / 1000) + 1);
+}
+
+function save() {
+  localStorage.setItem('starDemo', JSON.stringify({balance, streak, lastBonus}));
+  render();
+}
+
+function toast(text) {
+  const el = document.getElementById('toast');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function bonus() {
+  const today = new Date().toDateString();
+  if (lastBonus === today) {
+    toast('Бонус уже получен сегодня ✨');
+    return;
+  }
+  balance += 100;
+  streak++;
+  lastBonus = today;
+  save();
+  toast('Получено +100 тестовых звёзд! 🎉');
+}
+
+function openSection(section) {
+  if (section === 'Задания') {
+    toast('Тестовое задание скоро появится ✦');
+  } else if (section === 'Игры') {
+    balance += 10;
+    save();
+    toast('Демо-игра пройдена: +10 звёзд!');
+  } else if (section === 'Инвентарь') {
+    toast('Пока инвентарь пуст');
+  } else {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    toast(user ? 'Твой ID: ' + user.id : 'Профиль тестового игрока');
+  }
+}
+
+function nav(el, section) {
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  toast(section === 'Главная' ? 'Ты на главной' : section + ' — демо-раздел');
+}
+
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  const user = Telegram.WebApp.initDataUnsafe?.user;
+  if (user) {
+    document.getElementById('welcome').textContent =
+      'Привет, ' + (user.first_name || 'игрок') + '! Добро пожаловать.';
+  }
+}
+
+render();
+</script>
+</body>
+  </html>
